@@ -1,4 +1,4 @@
-sjs = sjs || {};
+var sjs = sjs || {};
 // Dependancies: util.js, sjs.toc
 
 
@@ -769,4 +769,4 @@ sjs.categoryColor = function(cat) {
     return sjs.categoryColors[cat];
   }
   return "transparent";
-}
+};

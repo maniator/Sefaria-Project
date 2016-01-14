@@ -81,6 +81,7 @@
 {% endblock %}
 
 {% block js %}
+    <script src="/static/js/library.js"></script>
     <script>
     {% autoescape off %}
     var lang = "{{ lang }}";
@@ -90,8 +91,27 @@
 
     var width = 960,
         height = 700,
-        radius = Math.min(width, height) / 2,
-        color = d3.scale.category20c();
+        radius = Math.min(width, height) / 2;
+        //color = d3.scale.category20c();
+
+    var colorKeys = Object.keys(sjs.categoryColors);
+    var colorValues = colorKeys.map(function(v) { return sjs.categoryColors[v]; });
+        colorKeys.push("");  // Root node
+        colorValues.push("#eeeeee");
+    var color = d3.scale.ordinal().domain(colorKeys).range(colorValues);
+    var catColor = {};
+    function deriveColor(d) {
+        if (d.depth < 2) {
+            var c = color(d.name);
+            var rgb = d3.rgb(c);
+            //catColor[d.name] = [rgb.brighter(.5),rgb.brighter(1),rgb.brighter(1.2),rgb.brighter(1.4),rgb.brighter(1.6),rgb.brighter(1.8)];
+            catColor[d.name] = d3.scale.ordinal().range([rgb.darker(1.5), rgb.darker(1), rgb.darker(.5), rgb.brighter(.5),rgb.brighter(1),rgb.brighter(1.5)]);
+            return c;
+        } else {
+            //return catColor[d.path[0]][d.depth-2];
+            return catColor[d.path[0]](d.name);
+        }
+    }
 
     d3.select("#title").text(get_title());
     d3.select("#langselect").html(
@@ -142,7 +162,8 @@
           .on("click", click)
           .on("mouseover", mouseover)
           .style("stroke", "#fff")
-          .style("fill", function(d) { return color((d.children ? d : d.parent).name); })
+          //.style("fill", function(d) { return color((d.children ? d : d.parent).name); })
+          .style("fill", deriveColor)
           .style("fill-rule", "evenodd")
         .append("title")
           .text(function (d) { return d.name; })
