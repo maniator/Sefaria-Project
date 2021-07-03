@@ -1,5 +1,5 @@
 selenium
-django==1.4.5
+django==3.1.13
 pymongo==2.9
 django-email-as-username
 diff_match_patch
